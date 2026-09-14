@@ -43,6 +43,12 @@ docker/                           # Container setup
 pip install -r requirements.txt
 ```
 
+Download the dataset from the briefing's
+[Google Drive link](https://drive.google.com/file/d/1bG7fA273jIBgJfc6YS1vsKfr1qRiNUTU/view)
+(`youtoxic_english_1000.csv`) and place it under `data/raw/` (gitignored —
+data is not versioned). `src/data/loader.py` maps its native
+`Text`/`IsHatespeech` columns to this project's `comment`/`label` schema.
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
