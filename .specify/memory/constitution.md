@@ -30,6 +30,9 @@ deployable solution over a maximally precise one**.
 - All work happens on feature branches created from `develop`.
 - `develop` is the integration branch; `main` only receives finished, working
   increments.
-- Every feature starts with a spec under `specs/` before implementation begins
-  in `src/`.
+- Every task/issue has its own spec under `specs/<issue-number>-<slug>/spec.md`
+  before implementation begins in `src/`, adapted from the base template at
+  [`specs/_template/spec.md`](../../specs/_template/spec.md). This applies to
+  new tasks going forward, and was applied retroactively to tasks that were
+  already Done when this rule was adopted.
 - Branch names, commit messages, and code comments are written in English.

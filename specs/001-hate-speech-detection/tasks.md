@@ -4,9 +4,15 @@ Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria
 
 ## 1. Data loading
 
-- [ ] Load the raw YouTube comments dataset into a DataFrame.
+- [x] Load the raw YouTube comments dataset into a DataFrame.
   - WHEN the dataset path is provided, THE SYSTEM SHALL load it into a pandas
     DataFrame with consistent column names.
+  - Implemented in `src/data/loader.py::load_comments`, verified by
+    `tests/test_data_loader.py` and enforced on every push/PR by the CI
+    harness (`.github/workflows/ci.yml`).
+  - Remaining: run `dataset_summary` against the real dataset once it is
+    placed in `data/raw/` (class balance, duplicates, nulls) — not yet done,
+    since only a synthetic sample was available at implementation time.
 
 ## 2. Preprocessing
 
