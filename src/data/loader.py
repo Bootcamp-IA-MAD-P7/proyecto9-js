@@ -3,6 +3,13 @@ import pandas as pd
 
 REQUIRED_COLUMNS = ["comment", "label"]
 
+# Known source dataset columns mapped to this project's normalized schema
+# (comment/label), so different raw formats can share the same loader.
+COLUMN_ALIASES = {
+    "text": "comment",  # youtoxic_english_1000.csv (briefing dataset)
+    "ishatespeech": "label",  # youtoxic_english_1000.csv (briefing dataset)
+}
+
 
 def load_comments(path: str) -> pd.DataFrame:
     """Load a raw comments CSV into a DataFrame with consistent column names.
@@ -13,11 +20,14 @@ def load_comments(path: str) -> pd.DataFrame:
     """
     df = pd.read_csv(path)
     df.columns = [c.strip().lower() for c in df.columns]
+    df = df.rename(columns=COLUMN_ALIASES)
 
     missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
 
+    df = df[REQUIRED_COLUMNS].copy()
+    df["label"] = df["label"].astype(int)
     return df
 
 
