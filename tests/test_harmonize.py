@@ -7,6 +7,7 @@ from src.data.harmonize import (
     SCHEMA_COLUMNS,
     combine_datasets,
     load_ethos,
+    load_haternet,
     load_hateval,
     load_hatexplain,
     load_measuring_hate_speech,
@@ -142,6 +143,23 @@ def test_load_hateval_maps_target_to_category_and_keeps_language(tmp_path):
     not_hate_row = df[df["comment"] == "have a nice day"].iloc[0]
     assert not_hate_row["label"] == 0
     assert not_hate_row["categories"] == "other"
+
+
+def test_load_haternet_parses_pipe_delimited_lines(tmp_path):
+    path = tmp_path / "haternet.txt"
+    path.write_text(
+        "id=1;||;eres un inutil;||;1\n"
+        "id=2;||;que tengas buen dia;||;0\n",
+        encoding="utf-8",
+    )
+
+    df = load_haternet(str(path))
+
+    assert list(df.columns) == SCHEMA_COLUMNS
+    assert set(df["language"]) == {"es"}
+    hate_row = df[df["comment"] == "eres un inutil"].iloc[0]
+    assert hate_row["label"] == 1
+    assert hate_row["categories"] == "other"
 
 
 def test_combine_datasets_concatenates_and_validates_schema():

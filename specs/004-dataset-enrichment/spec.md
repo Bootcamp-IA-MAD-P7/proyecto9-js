@@ -8,13 +8,13 @@
 
 ## What
 
-Combine the briefing dataset (`youtoxic_english_1000.csv`) with four
+Combine the briefing dataset (`youtoxic_english_1000.csv`) with five
 additional public hate-speech datasets — HateXplain, ETHOS, Measuring Hate
-Speech (UC Berkeley D-Lab), and HatEval — into a single enriched dataset,
-normalized to a common schema that captures not just a generic hate/not-hate
-flag but *which kind* of hate (racism, xenophobia, religion-based hate,
-misogyny, homophobia, transphobia, disability-based hate, classism,
-violence), and covering both English and Spanish.
+Speech (UC Berkeley D-Lab), HatEval, and HaterNet — into a single enriched
+dataset, normalized to a common schema that captures not just a generic
+hate/not-hate flag but *which kind* of hate (racism, xenophobia,
+religion-based hate, misogyny, homophobia, transphobia, disability-based
+hate, classism, violence), and covering both English and Spanish.
 
 > **Amendment (issue #34):** the spec originally shipped with only the
 > first three (English-only) sources, since HatEval required accepting a
@@ -22,6 +22,10 @@ violence), and covering both English and Spanish.
 > completed that step manually and provided the downloaded files; this
 > revision adds `load_hateval()` and Spanish coverage on top of the
 > original scope.
+>
+> **Amendment 2:** added HaterNet (Zenodo, ~6,000 Spanish tweets, freely
+> downloadable, no account needed) to further increase Spanish coverage,
+> which remained comparatively small (6,599 rows) after HatEval alone.
 
 ## Why
 
@@ -42,6 +46,8 @@ ensemble models, richer evaluation) can use.
 - Download HatEval (HuggingFace, 3 parquet splits) after the project owner
   manually created a HuggingFace account and accepted the dataset's access
   gate — the agent never handled any account credentials or access tokens.
+- Download HaterNet (Zenodo record 2592149, `labeled_corpus_6K.txt`) —
+  freely downloadable, CC-BY-4.0, no account needed.
 - Normalize each source to a shared schema:
   `comment, language, label, categories, source`.
 - Provide a `combine_datasets()` function that concatenates all normalized
@@ -53,6 +59,11 @@ ensemble models, richer evaluation) can use.
 
 - Any other Spanish-only dataset requiring an access request the project
   doesn't have (e.g. HOMO-MEX, DETOXIS) — not pursued for this spec.
+- MetaHateES and OffendES: both gate access behind an academic-consent form
+  requiring personal identifying information (name, institution, address,
+  phone), not just a click-through terms agreement — not pursued, since
+  that goes beyond what this project needs to request on the owner's
+  behalf.
 - Actual preprocessing/vectorization/model training on the enriched dataset
   (separate tasks in `specs/001-hate-speech-detection/tasks.md`).
 - Perfect category taxonomy alignment across sources — each source has its
@@ -78,7 +89,7 @@ ensemble models, richer evaluation) can use.
 ## Result
 
 Running `scripts/build_enriched_dataset.py` produces
-`data/processed/enriched_comments.csv` with **81,281 rows** (up from
+`data/processed/enriched_comments.csv` with **87,281 rows** (up from
 1,000), combining:
 
 | Source | Rows | Language |
@@ -86,14 +97,17 @@ Running `scripts/build_enriched_dataset.py` produces
 | `measuring_hate_speech` | 39,565 | en |
 | `hatexplain` | 20,148 | en |
 | `hateval` | 19,570 | en + es |
+| `haternet` | 6,000 | es |
 | `youtoxic` (briefing) | 1,000 | en |
 | `ethos` | 998 | en |
 
-Label balance improved from 13.8% to **~35.7%** hate (28,994 / 81,281).
-Language coverage: 74,682 English rows, **6,599 Spanish rows** (from
-HatEval). Categories now span racism, misogyny, violence, religion,
-homophobia, xenophobia, transphobia, disability, and classism (individually
-and in combination), instead of a single undifferentiated "hate" flag.
+Label balance improved from 13.8% to **~35.0%** hate (30,561 / 87,281).
+Language coverage: 74,682 English rows, **12,599 Spanish rows** (HatEval +
+HaterNet — up from 6,599 after adding HaterNet). Categories now span
+racism, misogyny, violence, religion, homophobia, xenophobia, transphobia,
+disability, and classism (individually and in combination), instead of a
+single undifferentiated "hate" flag. HaterNet itself only carries a binary
+hate flag (no sub-category breakdown), so its rows are tagged `"other"`.
 
 ## Open questions
 
