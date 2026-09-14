@@ -31,8 +31,14 @@ deployable solution over a maximally precise one**.
 - `develop` is the integration branch; `main` only receives finished, working
   increments.
 - Every task/issue has its own spec under `specs/<issue-number>-<slug>/spec.md`
-  before implementation begins in `src/`, adapted from the base template at
-  [`specs/_template/spec.md`](../../specs/_template/spec.md). This applies to
-  new tasks going forward, and was applied retroactively to tasks that were
-  already Done when this rule was adopted.
+  before implementation begins in `src/`. This applies to new tasks going
+  forward, and was applied retroactively to tasks that were already Done
+  when this rule was adopted.
+- Specs, plans, and tasks are created with the official
+  [Spec Kit](https://github.com/github/spec-kit) CLI (`specify`), using its
+  bundled Claude Code skills: `/speckit-specify`, `/speckit-plan`,
+  `/speckit-tasks`, `/speckit-implement` (optionally `/speckit-clarify`,
+  `/speckit-checklist`, `/speckit-analyze` before implementing). Its
+  templates live under `.specify/templates/` — do not hand-roll ad hoc spec
+  formats.
 - Branch names, commit messages, and code comments are written in English.

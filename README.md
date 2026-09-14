@@ -45,6 +45,22 @@ See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
 
+## Spec-Driven Development
+
+This project follows Spec-Driven Development using the official
+[Spec Kit](https://github.com/github/spec-kit) CLI (`specify`). Every task
+gets its own spec under `specs/<issue-number>-<slug>/` before implementation
+begins. If you have Claude Code installed, the bundled skills are available
+after cloning:
+
+```
+/speckit-constitution   # Establish/update project principles
+/speckit-specify        # Create a spec for a new task
+/speckit-plan           # Create its implementation plan
+/speckit-tasks          # Break it into atomic tasks
+/speckit-implement      # Execute the implementation
+```
+
 ## Branching workflow
 
 - `main`: stable, finished increments only.
