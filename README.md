@@ -52,10 +52,11 @@ data is not versioned). `src/data/loader.py` maps its native
 ### Enriched multi-category dataset (optional)
 
 The briefing dataset alone only has a single hate/not-hate flag and just
-1,000 rows. To combine it with six additional public datasets (HateXplain,
-ETHOS, Measuring Hate Speech, HatEval, HaterNet, OffendES) into a richer,
-bilingual dataset with category labels (racism, xenophobia, religion, misogyny,
-homophobia, transphobia, disability, classism, violence):
+1,000 rows. To combine it with eight additional public datasets (HateXplain,
+ETHOS, Measuring Hate Speech, HatEval, HaterNet, OffendES, HaSCoSVa,
+DETESTS) into a richer, bilingual dataset with category labels (racism,
+xenophobia, religion, misogyny, homophobia, transphobia, disability,
+classism, violence):
 
 1. Download the freely-available sources (no account needed):
 
@@ -66,19 +67,24 @@ homophobia, transphobia, disability, classism, violence):
    curl -L "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv" -o data/raw/external/ethos_multilabel.csv
    curl -L "https://huggingface.co/datasets/ucberkeley-dlab/measuring-hate-speech/resolve/main/measuring-hate-speech.parquet" -o data/raw/external/measuring_hate_speech.parquet
    curl -L "https://zenodo.org/records/2592149/files/labeled_corpus_6K.txt" -o data/raw/external/haternet_labeled_corpus_6k.txt
+   curl -L "https://gitlab.inria.fr/counter/HaSCoSVa/-/raw/main/dataset/hascosva_2022_anonymized.tsv" -o data/raw/external/hascosva.tsv
    mkdir -p data/raw/external/offendes
    curl -L "https://raw.githubusercontent.com/fmplaza/OffendES/main/split_MeOffendES/training_set.tsv" -o data/raw/external/offendes/training_set.tsv
    curl -L "https://raw.githubusercontent.com/fmplaza/OffendES/main/split_MeOffendES/dev_set.tsv" -o data/raw/external/offendes/dev_set.tsv
    curl -L "https://raw.githubusercontent.com/fmplaza/OffendES/main/split_MeOffendES/test_set.tsv" -o data/raw/external/offendes/test_set.tsv
    ```
 
-2. Download HatEval (the Spanish-language source) manually: create a free
-   [HuggingFace account](https://huggingface.co/join), accept the access
-   gate on [valeriobasile/HatEval](https://huggingface.co/datasets/valeriobasile/HatEval),
-   then download `train-00000-of-00001.parquet`, `dev-00000-of-00001.parquet`,
-   and `test-00000-of-00001.parquet` from its "Files and versions" tab into
-   `data/raw/external/hateval/` as `train.parquet`, `dev.parquet`, and
-   `test.parquet`.
+2. Download HatEval and DETESTS manually — both need a free
+   [HuggingFace account](https://huggingface.co/join) and a click-through
+   access gate (no personal-information form, just "agree and access"):
+   - [valeriobasile/HatEval](https://huggingface.co/datasets/valeriobasile/HatEval):
+     download `train-00000-of-00001.parquet`, `dev-00000-of-00001.parquet`,
+     and `test-00000-of-00001.parquet` from "Files and versions" into
+     `data/raw/external/hateval/` as `train.parquet`, `dev.parquet`, and
+     `test.parquet`.
+   - [CLiC-UB/DETESTS-Dis](https://huggingface.co/datasets/CLiC-UB/DETESTS-Dis):
+     download `train.csv` and `test.csv` from "Files and versions" into
+     `data/raw/external/detests/`.
 
 3. Build the combined dataset:
 
@@ -86,8 +92,8 @@ homophobia, transphobia, disability, classism, violence):
    python scripts/build_enriched_dataset.py
    ```
 
-This writes `data/processed/enriched_comments.csv` (~117,700 rows, ~29%
-hate, ~43,000 Spanish rows — over a third of the dataset). See
+This writes `data/processed/enriched_comments.csv` (~133,800 rows, ~29%
+hate, ~59,100 Spanish rows — near-parity with English). See
 [`specs/004-dataset-enrichment/spec.md`](specs/004-dataset-enrichment/spec.md)
 for the category-mapping decisions.
 

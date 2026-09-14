@@ -243,6 +243,37 @@ def load_offendes(*tsv_paths: str) -> pd.DataFrame:
     return df[SCHEMA_COLUMNS]
 
 
+def load_hascosva(path: str) -> pd.DataFrame:
+    """Load HaSCoSVa (Hate Speech against Venezuelan migrants, Spain +
+    LatAm Spanish variants), a TSV with columns text/label/variation. All
+    hateful rows target Venezuelan migrants, so they are tagged
+    "xenophobia"."""
+    df = pd.read_csv(path, sep="\t")
+
+    df["categories"] = df["label"].apply(lambda v: "xenophobia" if v else "other")
+    df["language"] = "es"
+    df["source"] = "hascosva"
+    df = df.rename(columns={"text": "comment"})
+
+    return df[SCHEMA_COLUMNS]
+
+
+def load_detests(*csv_paths: str) -> pd.DataFrame:
+    """Load DETESTS's train/test CSVs (Spanish news-comment stereotypes
+    about immigration). Uses the binary `stereotype` column; all hateful
+    rows are about immigration, so they are tagged "xenophobia"."""
+    frames = [pd.read_csv(path) for path in csv_paths]
+    df = pd.concat(frames, ignore_index=True)
+
+    df["label"] = df["stereotype"].astype(int)
+    df["categories"] = df["label"].apply(lambda v: "xenophobia" if v else "other")
+    df["language"] = "es"
+    df["source"] = "detests"
+    df = df.rename(columns={"text": "comment"})
+
+    return df[SCHEMA_COLUMNS]
+
+
 def combine_datasets(*dataframes: pd.DataFrame) -> pd.DataFrame:
     """Concatenate normalized source DataFrames into a single dataset."""
     for df in dataframes:

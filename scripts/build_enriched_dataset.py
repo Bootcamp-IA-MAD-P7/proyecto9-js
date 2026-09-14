@@ -12,7 +12,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.data.harmonize import (  # noqa: E402
     combine_datasets,
+    load_detests,
     load_ethos,
+    load_hascosva,
     load_haternet,
     load_hateval,
     load_hatexplain,
@@ -50,9 +52,22 @@ def main() -> None:
         str(EXTERNAL_DIR / "offendes" / "dev_set.tsv"),
         str(EXTERNAL_DIR / "offendes" / "test_set.tsv"),
     )
+    hascosva = load_hascosva(str(EXTERNAL_DIR / "hascosva.tsv"))
+    detests = load_detests(
+        str(EXTERNAL_DIR / "detests" / "train.csv"),
+        str(EXTERNAL_DIR / "detests" / "test.csv"),
+    )
 
     combined = combine_datasets(
-        youtoxic, hatexplain, ethos, measuring, hateval, haternet, offendes
+        youtoxic,
+        hatexplain,
+        ethos,
+        measuring,
+        hateval,
+        haternet,
+        offendes,
+        hascosva,
+        detests,
     )
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
