@@ -223,6 +223,26 @@ def load_haternet(path: str) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=SCHEMA_COLUMNS)
 
 
+# OffendES labels: OFP (offensive, targets a person), OFG (offensive,
+# targets a group), NO / NOE (not offensive, with/without expletives).
+OFFENDES_HATE_LABELS = {"OFP", "OFG"}
+
+
+def load_offendes(*tsv_paths: str) -> pd.DataFrame:
+    """Load one or more OffendES split TSVs (train/dev/test) into the shared
+    schema. No sub-category breakdown beyond person- vs. group-targeted, so
+    hateful rows are tagged "other"."""
+    frames = [pd.read_csv(path, sep="\t", quoting=1) for path in tsv_paths]
+    df = pd.concat(frames, ignore_index=True)
+
+    df["label"] = df["label"].isin(OFFENDES_HATE_LABELS).astype(int)
+    df["categories"] = "other"
+    df["language"] = "es"
+    df["source"] = "offendes"
+
+    return df[SCHEMA_COLUMNS]
+
+
 def combine_datasets(*dataframes: pd.DataFrame) -> pd.DataFrame:
     """Concatenate normalized source DataFrames into a single dataset."""
     for df in dataframes:
