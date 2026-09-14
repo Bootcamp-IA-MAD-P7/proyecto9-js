@@ -87,6 +87,36 @@ hate, ~12,600 Spanish rows). See
 [`specs/004-dataset-enrichment/spec.md`](specs/004-dataset-enrichment/spec.md)
 for the category-mapping decisions.
 
+### Auxiliary sarcasm dataset (optional, English + machine-translated Spanish)
+
+Kept separate from the hate-speech dataset above (different corpus, different
+annotation dimension — see
+[`specs/005-sarcasm-dataset/spec.md`](specs/005-sarcasm-dataset/spec.md) for
+why). To build it:
+
+1. Download the English source (no account needed):
+
+   ```bash
+   curl -L "https://raw.githubusercontent.com/rishabhmisra/News-Headlines-Dataset-For-Sarcasm-Detection/master/Sarcasm_Headlines_Dataset.json" -o data/raw/external/sarcasm_headlines_en.json
+   ```
+
+2. Install the heavy NLP dependencies (only needed for translation):
+
+   ```bash
+   pip install -r requirements-nlp.txt
+   ```
+
+3. Build the combined English + Spanish dataset:
+
+   ```bash
+   python scripts/build_sarcasm_dataset.py
+   ```
+
+This writes `data/processed/sarcasm_comments.csv` (~57,200 rows). The
+Spanish half is machine-translated (local model, no rate limits), not
+native Spanish sarcasm — translation takes ~80-90 minutes on CPU for the
+full corpus.
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
