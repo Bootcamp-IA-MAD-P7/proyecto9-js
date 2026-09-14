@@ -49,6 +49,34 @@ Download the dataset from the briefing's
 data is not versioned). `src/data/loader.py` maps its native
 `Text`/`IsHatespeech` columns to this project's `comment`/`label` schema.
 
+### Enriched multi-category dataset (optional)
+
+The briefing dataset alone only has a single hate/not-hate flag and just
+1,000 rows. To combine it with three additional public English datasets
+(HateXplain, ETHOS, Measuring Hate Speech) into a richer dataset with
+category labels (racism, xenophobia, religion, misogyny, homophobia,
+transphobia, disability, classism, violence), download them into
+`data/raw/external/`:
+
+```bash
+mkdir -p data/raw/external
+curl -L "https://raw.githubusercontent.com/hate-alert/HateXplain/master/Data/dataset.json" -o data/raw/external/hatexplain_dataset.json
+curl -L "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Binary.csv" -o data/raw/external/ethos_binary.csv
+curl -L "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv" -o data/raw/external/ethos_multilabel.csv
+curl -L "https://huggingface.co/datasets/ucberkeley-dlab/measuring-hate-speech/resolve/main/measuring-hate-speech.parquet" -o data/raw/external/measuring_hate_speech.parquet
+```
+
+Then build the combined dataset:
+
+```bash
+python scripts/build_enriched_dataset.py
+```
+
+This writes `data/processed/enriched_comments_en.csv` (~61,700 rows, ~32%
+hate). See [`specs/004-dataset-enrichment/spec.md`](specs/004-dataset-enrichment/spec.md)
+for the category-mapping decisions. Spanish-language coverage is not yet
+included — see issue #34 (blocked by a HuggingFace access gate on HatEval).
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
