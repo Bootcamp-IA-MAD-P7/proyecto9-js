@@ -33,6 +33,23 @@ hate, classism, violence), and covering both English and Spanish.
 > (`fmplaza/OffendES`) with no authentication of any kind — the HF gate
 > only protects the HF-hosted copy, not the underlying data. This nearly
 > quadrupled Spanish coverage in one step.
+>
+> **Amendment 4:** investigated MetaHateES (a 10-source Spanish
+> meta-corpus) as a possible further Spanish boost. Its own access form
+> requires substantial personal identifying information (name, institution,
+> address, phone) sent to the authors — out of scope for this project to
+> request on the owner's behalf. However, its README documents which of
+> the 10 component sources need no individual consent at all; two of those
+> were not yet in this dataset and are freely obtainable directly from
+> their original hosts: **HaSCoSVa** (4,000 Spanish tweets about hate
+> speech against Venezuelan migrants, hosted on a public GitLab repo, zero
+> authentication) and **DETESTS** (12,111 rows of immigration-related
+> stereotypes in Spanish news-article comment threads, a simple
+> click-through HuggingFace gate — the project owner accepted it, no
+> personal-information form). A third source, HateFootball, could not be
+> retrieved (its host server was unreachable during this work); the
+> remaining four (EXIST, NewsCom-TOX, MisoCorpus, MeTwo) require emailing
+> individual researchers directly and were not pursued.
 
 ## Why
 
@@ -96,7 +113,7 @@ ensemble models, richer evaluation) can use.
 ## Result
 
 Running `scripts/build_enriched_dataset.py` produces
-`data/processed/enriched_comments.csv` with **117,697 rows** (up from
+`data/processed/enriched_comments.csv` with **133,808 rows** (up from
 1,000), combining:
 
 | Source | Rows | Language |
@@ -105,21 +122,23 @@ Running `scripts/build_enriched_dataset.py` produces
 | `offendes` | 30,416 | es |
 | `hatexplain` | 20,148 | en |
 | `hateval` | 19,570 | en + es |
+| `detests` | 12,111 | es |
 | `haternet` | 6,000 | es |
+| `hascosva` | 4,000 | es |
 | `youtoxic` (briefing) | 1,000 | en |
 | `ethos` | 998 | en |
 
-Label balance: **~29.3%** hate (34,482 / 117,697) — went down slightly from
-35.0% because OffendES's offensive rate (~16%) is lower than the rest.
-Language coverage: 74,682 English rows, **43,015 Spanish rows** — Spanish
-went from a small minority (6,599 / 81,281 ≈ 8%) to over a third of the
-dataset (43,015 / 117,697 ≈ 36.5%) after adding HaterNet and OffendES.
-Categories now span racism, misogyny, violence, religion, homophobia,
-xenophobia, transphobia, disability, and classism (individually and in
-combination), instead of a single undifferentiated "hate" flag. HaterNet
-and OffendES only carry a binary flag (no sub-category breakdown beyond
-OffendES's person-vs-group distinction, which doesn't map to a specific
-identity category), so their rows are tagged `"other"`.
+Label balance: **~28.8%** hate (38,562 / 133,808). Language coverage:
+74,682 English rows, **59,126 Spanish rows** — Spanish went from a small
+minority (6,599 / 81,281 ≈ 8%) to near-parity with English (59,126 /
+133,808 ≈ 44.2%). Categories now span racism, misogyny, violence,
+religion, homophobia, xenophobia, transphobia, disability, and classism
+(individually and in combination), instead of a single undifferentiated
+"hate" flag. HaterNet and OffendES only carry a binary flag (no
+sub-category breakdown beyond OffendES's person-vs-group distinction,
+which doesn't map to a specific identity category), so their rows are
+tagged `"other"`. HaSCoSVa and DETESTS are both specifically about
+immigration-related hate, so their hateful rows are tagged `"xenophobia"`.
 
 ## Open questions
 
