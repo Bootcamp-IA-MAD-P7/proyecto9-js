@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.data.harmonize import (  # noqa: E402
     combine_datasets,
     load_ethos,
+    load_haternet,
     load_hateval,
     load_hatexplain,
     load_measuring_hate_speech,
@@ -42,8 +43,9 @@ def main() -> None:
         str(EXTERNAL_DIR / "hateval" / "dev.parquet"),
         str(EXTERNAL_DIR / "hateval" / "test.parquet"),
     )
+    haternet = load_haternet(str(EXTERNAL_DIR / "haternet_labeled_corpus_6k.txt"))
 
-    combined = combine_datasets(youtoxic, hatexplain, ethos, measuring, hateval)
+    combined = combine_datasets(youtoxic, hatexplain, ethos, measuring, hateval, haternet)
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     combined.to_csv(OUTPUT_PATH, index=False)
