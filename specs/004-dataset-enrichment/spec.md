@@ -8,13 +8,20 @@
 
 ## What
 
-Combine the briefing dataset (`youtoxic_english_1000.csv`) with three
-additional public English hate-speech datasets — HateXplain, ETHOS, and
-Measuring Hate Speech (UC Berkeley D-Lab) — into a single enriched dataset,
+Combine the briefing dataset (`youtoxic_english_1000.csv`) with four
+additional public hate-speech datasets — HateXplain, ETHOS, Measuring Hate
+Speech (UC Berkeley D-Lab), and HatEval — into a single enriched dataset,
 normalized to a common schema that captures not just a generic hate/not-hate
 flag but *which kind* of hate (racism, xenophobia, religion-based hate,
 misogyny, homophobia, transphobia, disability-based hate, classism,
-violence).
+violence), and covering both English and Spanish.
+
+> **Amendment (issue #34):** the spec originally shipped with only the
+> first three (English-only) sources, since HatEval required accepting a
+> HuggingFace access gate the project didn't yet have. The project owner
+> completed that step manually and provided the downloaded files; this
+> revision adds `load_hateval()` and Spanish coverage on top of the
+> original scope.
 
 ## Why
 
@@ -30,8 +37,11 @@ ensemble models, richer evaluation) can use.
 ## Scope
 
 - Download HateXplain (GitHub, `dataset.json`), ETHOS (GitHub, binary +
-  multi-label CSVs), and Measuring Hate Speech (HuggingFace, parquet) — all
+  multi-label CSVs), and Measuring Hate Speech (HuggingFace, parquet) —
   freely downloadable without an account.
+- Download HatEval (HuggingFace, 3 parquet splits) after the project owner
+  manually created a HuggingFace account and accepted the dataset's access
+  gate — the agent never handled any account credentials or access tokens.
 - Normalize each source to a shared schema:
   `comment, language, label, categories, source`.
 - Provide a `combine_datasets()` function that concatenates all normalized
@@ -41,8 +51,8 @@ ensemble models, richer evaluation) can use.
 
 ## Out of scope
 
-- HatEval and any other dataset that requires accepting terms on an account
-  the project doesn't have — tracked separately in issue #34.
+- Any other Spanish-only dataset requiring an access request the project
+  doesn't have (e.g. HOMO-MEX, DETOXIS) — not pursued for this spec.
 - Actual preprocessing/vectorization/model training on the enriched dataset
   (separate tasks in `specs/001-hate-speech-detection/tasks.md`).
 - Perfect category taxonomy alignment across sources — each source has its
@@ -68,20 +78,22 @@ ensemble models, richer evaluation) can use.
 ## Result
 
 Running `scripts/build_enriched_dataset.py` produces
-`data/processed/enriched_comments_en.csv` with **61,711 rows** (up from
+`data/processed/enriched_comments.csv` with **81,281 rows** (up from
 1,000), combining:
 
-| Source | Rows |
-|---|---|
-| `measuring_hate_speech` | 39,565 |
-| `hatexplain` | 20,148 |
-| `youtoxic` (briefing) | 1,000 |
-| `ethos` | 998 |
+| Source | Rows | Language |
+|---|---|---|
+| `measuring_hate_speech` | 39,565 | en |
+| `hatexplain` | 20,148 | en |
+| `hateval` | 19,570 | en + es |
+| `youtoxic` (briefing) | 1,000 | en |
+| `ethos` | 998 | en |
 
-Label balance improved from 13.8% to **~32.2%** hate (19,874 / 61,711), and
-categories now span racism, misogyny, violence, religion, homophobia,
-xenophobia, transphobia, disability, and classism (individually and in
-combination), instead of a single undifferentiated "hate" flag.
+Label balance improved from 13.8% to **~35.7%** hate (28,994 / 81,281).
+Language coverage: 74,682 English rows, **6,599 Spanish rows** (from
+HatEval). Categories now span racism, misogyny, violence, religion,
+homophobia, xenophobia, transphobia, disability, and classism (individually
+and in combination), instead of a single undifferentiated "hate" flag.
 
 ## Open questions
 
@@ -89,5 +101,9 @@ combination), instead of a single undifferentiated "hate" flag.
   "hatespeech") count as hate for this project's binary target? Resolved:
   no — only the strict "hatespeech" majority label counts, to keep the
   label consistent with the briefing's own "hate speech" framing.
-- Spanish coverage remains unresolved until issue #34 (HatEval access) is
-  unblocked.
+- Spanish coverage: resolved via HatEval (issue #34) — the project owner
+  created a HuggingFace account, accepted the dataset's access gate, and
+  downloaded the 3 parquet files manually (no API token was shared with or
+  used by the agent). Other Spanish-only datasets (HaterMex, DETOXIS,
+  HOMO-MEX) remain unexplored; Spanish coverage today comes only from
+  HatEval's ~6,600 rows (misogyny/xenophobia only, no other categories).

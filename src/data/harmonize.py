@@ -172,6 +172,33 @@ def load_measuring_hate_speech(path: str, threshold: float = 0.5) -> pd.DataFram
     return agg.reset_index()[SCHEMA_COLUMNS]
 
 
+# HatEval's `target` column: "mig" (hate against migrants/immigrants) or
+# "mis" (hate against women, i.e. misogyny).
+HATEVAL_TARGET_MAP = {
+    "mig": "xenophobia",
+    "mis": "misogyny",
+}
+
+
+def load_hateval(train_path: str, dev_path: str, test_path: str) -> pd.DataFrame:
+    """Load HatEval's train/dev/test parquet splits (English and Spanish
+    tweets about hate towards immigrants and women) into the shared schema."""
+    df = pd.concat(
+        [pd.read_parquet(train_path), pd.read_parquet(dev_path), pd.read_parquet(test_path)],
+        ignore_index=True,
+    )
+
+    df["label"] = df["HS"].astype(int)
+    df["categories"] = df.apply(
+        lambda row: HATEVAL_TARGET_MAP.get(row["target"], "other") if row["label"] else "other",
+        axis=1,
+    )
+    df["source"] = "hateval"
+    df = df.rename(columns={"text": "comment"})
+
+    return df[SCHEMA_COLUMNS]
+
+
 def combine_datasets(*dataframes: pd.DataFrame) -> pd.DataFrame:
     """Concatenate normalized source DataFrames into a single dataset."""
     for df in dataframes:
