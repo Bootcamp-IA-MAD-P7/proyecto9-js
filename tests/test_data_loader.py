@@ -36,3 +36,20 @@ def test_dataset_summary_reports_size_duplicates_and_class_balance(sample_csv):
     assert summary["n_duplicates"] == 0
     assert summary["n_nulls"] == 0
     assert summary["label_counts"] == {1: 2, 0: 2}
+
+
+def test_load_comments_maps_briefing_dataset_schema(tmp_path):
+    """The briefing dataset (youtoxic_english_1000.csv) uses Text/IsHatespeech
+    instead of comment/label; the loader must normalize it transparently."""
+    path = tmp_path / "youtoxic_sample.csv"
+    pd.DataFrame(
+        {
+            "CommentId": ["a", "b"],
+            "Text": ["I hate you", "Have a nice day"],
+            "IsHatespeech": [True, False],
+        }
+    ).to_csv(path, index=False)
+
+    df = load_comments(str(path))
+    assert list(df.columns) == ["comment", "label"]
+    assert df["label"].tolist() == [1, 0]
