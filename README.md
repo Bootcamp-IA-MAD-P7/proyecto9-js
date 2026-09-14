@@ -52,30 +52,39 @@ data is not versioned). `src/data/loader.py` maps its native
 ### Enriched multi-category dataset (optional)
 
 The briefing dataset alone only has a single hate/not-hate flag and just
-1,000 rows. To combine it with three additional public English datasets
-(HateXplain, ETHOS, Measuring Hate Speech) into a richer dataset with
+1,000 rows. To combine it with four additional public datasets (HateXplain,
+ETHOS, Measuring Hate Speech, HatEval) into a richer, bilingual dataset with
 category labels (racism, xenophobia, religion, misogyny, homophobia,
-transphobia, disability, classism, violence), download them into
-`data/raw/external/`:
+transphobia, disability, classism, violence):
 
-```bash
-mkdir -p data/raw/external
-curl -L "https://raw.githubusercontent.com/hate-alert/HateXplain/master/Data/dataset.json" -o data/raw/external/hatexplain_dataset.json
-curl -L "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Binary.csv" -o data/raw/external/ethos_binary.csv
-curl -L "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv" -o data/raw/external/ethos_multilabel.csv
-curl -L "https://huggingface.co/datasets/ucberkeley-dlab/measuring-hate-speech/resolve/main/measuring-hate-speech.parquet" -o data/raw/external/measuring_hate_speech.parquet
-```
+1. Download the freely-available sources (no account needed):
 
-Then build the combined dataset:
+   ```bash
+   mkdir -p data/raw/external
+   curl -L "https://raw.githubusercontent.com/hate-alert/HateXplain/master/Data/dataset.json" -o data/raw/external/hatexplain_dataset.json
+   curl -L "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Binary.csv" -o data/raw/external/ethos_binary.csv
+   curl -L "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv" -o data/raw/external/ethos_multilabel.csv
+   curl -L "https://huggingface.co/datasets/ucberkeley-dlab/measuring-hate-speech/resolve/main/measuring-hate-speech.parquet" -o data/raw/external/measuring_hate_speech.parquet
+   ```
 
-```bash
-python scripts/build_enriched_dataset.py
-```
+2. Download HatEval (the Spanish-language source) manually: create a free
+   [HuggingFace account](https://huggingface.co/join), accept the access
+   gate on [valeriobasile/HatEval](https://huggingface.co/datasets/valeriobasile/HatEval),
+   then download `train-00000-of-00001.parquet`, `dev-00000-of-00001.parquet`,
+   and `test-00000-of-00001.parquet` from its "Files and versions" tab into
+   `data/raw/external/hateval/` as `train.parquet`, `dev.parquet`, and
+   `test.parquet`.
 
-This writes `data/processed/enriched_comments_en.csv` (~61,700 rows, ~32%
-hate). See [`specs/004-dataset-enrichment/spec.md`](specs/004-dataset-enrichment/spec.md)
-for the category-mapping decisions. Spanish-language coverage is not yet
-included — see issue #34 (blocked by a HuggingFace access gate on HatEval).
+3. Build the combined dataset:
+
+   ```bash
+   python scripts/build_enriched_dataset.py
+   ```
+
+This writes `data/processed/enriched_comments.csv` (~81,300 rows, ~36%
+hate, ~6,600 Spanish rows). See
+[`specs/004-dataset-enrichment/spec.md`](specs/004-dataset-enrichment/spec.md)
+for the category-mapping decisions.
 
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
