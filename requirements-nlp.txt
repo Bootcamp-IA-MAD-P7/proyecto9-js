@@ -1,0 +1,8 @@
+# Heavy, optional dependencies for local machine translation
+# (src/data/translate.py) and future deep-learning tasks (RNN/LSTM,
+# transformers — Nivel Avanzado/Experto). Not installed by CI: keep the
+# default `pip install -r requirements.txt` fast for everyday work.
+torch
+transformers
+sentencepiece
+sacremoses
