@@ -199,6 +199,30 @@ def load_hateval(train_path: str, dev_path: str, test_path: str) -> pd.DataFrame
     return df[SCHEMA_COLUMNS]
 
 
+def load_haternet(path: str) -> pd.DataFrame:
+    """Load HaterNet's labeled_corpus_6K.txt (Spanish tweets, Zenodo record
+    2592149). Each line is "id=<id>;||;<text>;||;<label>". The dataset only
+    carries a binary hate flag, no sub-category breakdown."""
+    rows = []
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.rstrip("\n")
+            if not line:
+                continue
+            _id_part, text, label = line.split(";||;")
+            rows.append(
+                {
+                    "comment": text,
+                    "language": "es",
+                    "label": int(label),
+                    "categories": "other",
+                    "source": "haternet",
+                }
+            )
+
+    return pd.DataFrame(rows, columns=SCHEMA_COLUMNS)
+
+
 def combine_datasets(*dataframes: pd.DataFrame) -> pd.DataFrame:
     """Concatenate normalized source DataFrames into a single dataset."""
     for df in dataframes:
