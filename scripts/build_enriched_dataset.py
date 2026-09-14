@@ -17,6 +17,7 @@ from src.data.harmonize import (  # noqa: E402
     load_hateval,
     load_hatexplain,
     load_measuring_hate_speech,
+    load_offendes,
 )
 from src.data.loader import load_comments  # noqa: E402
 
@@ -44,8 +45,15 @@ def main() -> None:
         str(EXTERNAL_DIR / "hateval" / "test.parquet"),
     )
     haternet = load_haternet(str(EXTERNAL_DIR / "haternet_labeled_corpus_6k.txt"))
+    offendes = load_offendes(
+        str(EXTERNAL_DIR / "offendes" / "training_set.tsv"),
+        str(EXTERNAL_DIR / "offendes" / "dev_set.tsv"),
+        str(EXTERNAL_DIR / "offendes" / "test_set.tsv"),
+    )
 
-    combined = combine_datasets(youtoxic, hatexplain, ethos, measuring, hateval, haternet)
+    combined = combine_datasets(
+        youtoxic, hatexplain, ethos, measuring, hateval, haternet, offendes
+    )
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     combined.to_csv(OUTPUT_PATH, index=False)
