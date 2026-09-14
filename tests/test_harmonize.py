@@ -11,6 +11,7 @@ from src.data.harmonize import (
     load_hateval,
     load_hatexplain,
     load_measuring_hate_speech,
+    load_offendes,
 )
 
 
@@ -160,6 +161,25 @@ def test_load_haternet_parses_pipe_delimited_lines(tmp_path):
     hate_row = df[df["comment"] == "eres un inutil"].iloc[0]
     assert hate_row["label"] == 1
     assert hate_row["categories"] == "other"
+
+
+def test_load_offendes_maps_person_and_group_offense_to_hate(tmp_path):
+    path = tmp_path / "offendes.tsv"
+    path.write_text(
+        'comment_id\tcomment\tinfluencer\tinfluencer_gender\tmedia\tlabel\n'
+        '"1"\t"eres un inutil"\t"x"\t"man"\t"twitter"\t"OFP"\n'
+        '"2"\t"odio a esa gente"\t"x"\t"man"\t"twitter"\t"OFG"\n'
+        '"3"\t"buen dia a todos"\t"x"\t"man"\t"twitter"\t"NO"\n',
+        encoding="utf-8",
+    )
+
+    df = load_offendes(str(path))
+
+    assert list(df.columns) == SCHEMA_COLUMNS
+    assert set(df["language"]) == {"es"}
+    assert df[df["comment"] == "eres un inutil"].iloc[0]["label"] == 1
+    assert df[df["comment"] == "odio a esa gente"].iloc[0]["label"] == 1
+    assert df[df["comment"] == "buen dia a todos"].iloc[0]["label"] == 0
 
 
 def test_combine_datasets_concatenates_and_validates_schema():
