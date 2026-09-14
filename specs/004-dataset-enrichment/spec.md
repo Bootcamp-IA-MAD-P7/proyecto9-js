@@ -26,6 +26,13 @@ hate, classism, violence), and covering both English and Spanish.
 > **Amendment 2:** added HaterNet (Zenodo, ~6,000 Spanish tweets, freely
 > downloadable, no account needed) to further increase Spanish coverage,
 > which remained comparatively small (6,599 rows) after HatEval alone.
+>
+> **Amendment 3:** added OffendES (30,416 Spanish comments). HuggingFace
+> lists it as "gated", but its loading script (`offendes.py`) downloads the
+> actual TSV splits from a fully public GitHub repo
+> (`fmplaza/OffendES`) with no authentication of any kind — the HF gate
+> only protects the HF-hosted copy, not the underlying data. This nearly
+> quadrupled Spanish coverage in one step.
 
 ## Why
 
@@ -89,25 +96,30 @@ ensemble models, richer evaluation) can use.
 ## Result
 
 Running `scripts/build_enriched_dataset.py` produces
-`data/processed/enriched_comments.csv` with **87,281 rows** (up from
+`data/processed/enriched_comments.csv` with **117,697 rows** (up from
 1,000), combining:
 
 | Source | Rows | Language |
 |---|---|---|
 | `measuring_hate_speech` | 39,565 | en |
+| `offendes` | 30,416 | es |
 | `hatexplain` | 20,148 | en |
 | `hateval` | 19,570 | en + es |
 | `haternet` | 6,000 | es |
 | `youtoxic` (briefing) | 1,000 | en |
 | `ethos` | 998 | en |
 
-Label balance improved from 13.8% to **~35.0%** hate (30,561 / 87,281).
-Language coverage: 74,682 English rows, **12,599 Spanish rows** (HatEval +
-HaterNet — up from 6,599 after adding HaterNet). Categories now span
-racism, misogyny, violence, religion, homophobia, xenophobia, transphobia,
-disability, and classism (individually and in combination), instead of a
-single undifferentiated "hate" flag. HaterNet itself only carries a binary
-hate flag (no sub-category breakdown), so its rows are tagged `"other"`.
+Label balance: **~29.3%** hate (34,482 / 117,697) — went down slightly from
+35.0% because OffendES's offensive rate (~16%) is lower than the rest.
+Language coverage: 74,682 English rows, **43,015 Spanish rows** — Spanish
+went from a small minority (6,599 / 81,281 ≈ 8%) to over a third of the
+dataset (43,015 / 117,697 ≈ 36.5%) after adding HaterNet and OffendES.
+Categories now span racism, misogyny, violence, religion, homophobia,
+xenophobia, transphobia, disability, and classism (individually and in
+combination), instead of a single undifferentiated "hate" flag. HaterNet
+and OffendES only carry a binary flag (no sub-category breakdown beyond
+OffendES's person-vs-group distinction, which doesn't map to a specific
+identity category), so their rows are tagged `"other"`.
 
 ## Open questions
 
