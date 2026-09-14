@@ -90,3 +90,5 @@ after cloning:
 - `main`: stable, finished increments only.
 - `develop`: integration branch for ongoing work.
 - Feature branches are created from `develop` and merged back via pull request.
+- Both `main` and `develop` are protected: the CI check must pass before a
+  PR can be merged, and neither branch accepts force-pushes or deletion.
