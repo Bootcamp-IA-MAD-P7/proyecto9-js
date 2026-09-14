@@ -27,3 +27,6 @@ data/processed/*
 .DS_Store
 Thumbs.db
 docs/sdd-harness-guide.md
+
+# Local coding agent settings (machine-specific, not shared)
+.claude/settings.local.json
