@@ -42,3 +42,8 @@ deployable solution over a maximally precise one**.
   templates live under `.specify/templates/` — do not hand-roll ad hoc spec
   formats.
 - Branch names, commit messages, and code comments are written in English.
+- `develop` and `main` are protected: the CI check (`test`, from
+  `.github/workflows/ci.yml`) must pass before a pull request can be
+  merged, and neither branch accepts force-pushes or deletion. This
+  required making the repository public, since GitHub only offers branch
+  protection on private repos on paid plans.
