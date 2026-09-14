@@ -7,6 +7,7 @@ from src.data.harmonize import (
     SCHEMA_COLUMNS,
     combine_datasets,
     load_ethos,
+    load_hateval,
     load_hatexplain,
     load_measuring_hate_speech,
 )
@@ -103,6 +104,44 @@ def test_load_measuring_hate_speech_aggregates_annotations(tmp_path):
     hate_row = df[df["comment"] == "go back home"].iloc[0]
     assert hate_row["label"] == 1
     assert hate_row["categories"] == "xenophobia"
+
+
+def test_load_hateval_maps_target_to_category_and_keeps_language(tmp_path):
+    train_path = tmp_path / "train.parquet"
+    dev_path = tmp_path / "dev.parquet"
+    test_path = tmp_path / "test.parquet"
+
+    pd.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "text": ["go back to your country", "que vuelvan a su pais", "have a nice day"],
+            "target": ["mig", "mig", "mis"],
+            "language": ["en", "es", "en"],
+            "HS": [1, 1, 0],
+            "TR": [0, 0, 0],
+            "AG": [0, 0, 0],
+        }
+    ).to_parquet(train_path)
+    empty_columns = ["id", "text", "target", "language", "HS", "TR", "AG"]
+    pd.DataFrame(columns=empty_columns).to_parquet(dev_path)
+    pd.DataFrame(columns=empty_columns).to_parquet(test_path)
+
+    df = load_hateval(str(train_path), str(dev_path), str(test_path))
+
+    assert list(df.columns) == SCHEMA_COLUMNS
+    assert set(df["language"]) == {"en", "es"}
+
+    en_hate_row = df[df["comment"] == "go back to your country"].iloc[0]
+    assert en_hate_row["label"] == 1
+    assert en_hate_row["categories"] == "xenophobia"
+
+    es_hate_row = df[df["comment"] == "que vuelvan a su pais"].iloc[0]
+    assert es_hate_row["language"] == "es"
+    assert es_hate_row["categories"] == "xenophobia"
+
+    not_hate_row = df[df["comment"] == "have a nice day"].iloc[0]
+    assert not_hate_row["label"] == 0
+    assert not_hate_row["categories"] == "other"
 
 
 def test_combine_datasets_concatenates_and_validates_schema():
