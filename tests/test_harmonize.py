@@ -6,7 +6,9 @@ import pytest
 from src.data.harmonize import (
     SCHEMA_COLUMNS,
     combine_datasets,
+    load_detests,
     load_ethos,
+    load_hascosva,
     load_haternet,
     load_hateval,
     load_hatexplain,
@@ -180,6 +182,47 @@ def test_load_offendes_maps_person_and_group_offense_to_hate(tmp_path):
     assert df[df["comment"] == "eres un inutil"].iloc[0]["label"] == 1
     assert df[df["comment"] == "odio a esa gente"].iloc[0]["label"] == 1
     assert df[df["comment"] == "buen dia a todos"].iloc[0]["label"] == 0
+
+
+def test_load_hascosva_tags_hate_as_xenophobia(tmp_path):
+    path = tmp_path / "hascosva.tsv"
+    pd.DataFrame(
+        {
+            "text": ["vuelvan a su pais venecos", "bienvenidos a todos"],
+            "label": [1, 0],
+            "variation": ["latam", "europe"],
+        }
+    ).to_csv(path, sep="\t", index=False)
+
+    df = load_hascosva(str(path))
+
+    assert list(df.columns) == SCHEMA_COLUMNS
+    assert set(df["language"]) == {"es"}
+    hate_row = df[df["comment"] == "vuelvan a su pais venecos"].iloc[0]
+    assert hate_row["label"] == 1
+    assert hate_row["categories"] == "xenophobia"
+    normal_row = df[df["comment"] == "bienvenidos a todos"].iloc[0]
+    assert normal_row["label"] == 0
+    assert normal_row["categories"] == "other"
+
+
+def test_load_detests_tags_stereotype_as_xenophobia(tmp_path):
+    train_path = tmp_path / "train.csv"
+    test_path = tmp_path / "test.csv"
+    pd.DataFrame(
+        {"text": ["los inmigrantes roban trabajo"], "stereotype": [1]}
+    ).to_csv(train_path, index=False)
+    pd.DataFrame(
+        {"text": ["gracias por la ayuda"], "stereotype": [0]}
+    ).to_csv(test_path, index=False)
+
+    df = load_detests(str(train_path), str(test_path))
+
+    assert list(df.columns) == SCHEMA_COLUMNS
+    assert len(df) == 2
+    hate_row = df[df["comment"] == "los inmigrantes roban trabajo"].iloc[0]
+    assert hate_row["label"] == 1
+    assert hate_row["categories"] == "xenophobia"
 
 
 def test_combine_datasets_concatenates_and_validates_schema():
