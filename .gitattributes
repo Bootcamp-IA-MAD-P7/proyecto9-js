@@ -1,0 +1,8 @@
+# Spec Kit CLI-generated infrastructure — tooling brought in by `specify init`,
+# not code written by the team. Excluded from GitHub's language stats and
+# collapsed by default in PR diffs.
+.specify/scripts/** linguist-vendored
+.specify/templates/** linguist-vendored
+.specify/workflows/** linguist-vendored
+.specify/integrations/** linguist-vendored
+.claude/skills/** linguist-vendored
