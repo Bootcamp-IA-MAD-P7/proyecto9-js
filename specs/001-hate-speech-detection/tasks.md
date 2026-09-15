@@ -1,0 +1,112 @@
+# Tasks: Hate Speech Detection in YouTube Comments
+
+Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria.
+
+## 1. Data loading
+
+- [x] Load the raw YouTube comments dataset into a DataFrame.
+  - WHEN the dataset path is provided, THE SYSTEM SHALL load it into a pandas
+    DataFrame with consistent column names.
+  - Implemented in `src/data/loader.py::load_comments`, verified by
+    `tests/test_data_loader.py` and enforced on every push/PR by the CI
+    harness (`.github/workflows/ci.yml`).
+  - Real dataset (`data/raw/youtoxic_english_1000.csv`, from the briefing's
+    Google Drive link) downloaded and explored via `dataset_summary`:
+    1000 rows, 0 nulls, 3 duplicate comments, label imbalance of 862
+    not-hate (`IsHatespeech=False`) vs. 138 hate (`IsHatespeech=True`),
+    i.e. ~13.8% positive class. The loader maps the dataset's native
+    `Text`/`IsHatespeech` columns to the project's `comment`/`label`
+    schema via `COLUMN_ALIASES`.
+  - The class imbalance (13.8% hate) means accuracy alone will be
+    misleading for later evaluation tasks — favor precision/recall/F1 and
+    consider class weighting during model training.
+
+## 2. Preprocessing
+
+- [x] Implement text cleaning (lowercasing, URL/mention/emoji removal via regex).
+  - WHEN raw comment text is passed in, THE SYSTEM SHALL return cleaned text with
+    no URLs, HTML entities, or control characters.
+- [x] Implement tokenization and stopword removal.
+- [x] Implement stemming/lemmatization.
+  - WHEN cleaned text is tokenized, THE SYSTEM SHALL return a list of
+    lemmatized/stemmed tokens excluding stopwords.
+  - See `specs/006-text-preprocessing/spec.md` for the full design.
+    Implemented in `src/preprocessing/{clean,tokenize,stem,pipeline}.py`,
+    language-aware (English/Spanish, matching the bilingual enriched
+    dataset), verified by `tests/test_preprocessing.py`. Applied to the
+    full 133,808-row enriched dataset in 46s via
+    `scripts/preprocess_enriched_dataset.py`.
+
+## 3. Feature extraction
+
+- [x] Implement TF-IDF vectorization.
+- [x] Implement Bag of Words vectorization for comparison.
+  - WHEN a preprocessed corpus is vectorized, THE SYSTEM SHALL produce a fixed-size
+    numeric feature matrix usable by scikit-learn estimators.
+  - See `specs/049-classic-text-vectorization/spec.md`. Implemented in
+    `src/features/vectorize.py`, verified by `tests/test_vectorize.py`.
+    Both vectorizers, run via `scripts/build_features.py` against the full
+    151,848-row Spanish-augmented dataset
+    (`enriched_comments_es_augmented_preprocessed.csv`), share an
+    18,417-token vocabulary (min_df=5, 99.94% sparse); TF-IDF was picked
+    as the baseline and persisted to
+    `data/processed/tfidf_vectorizer.joblib`.
+
+## 4. Model training
+
+- [x] Train baseline Logistic Regression on TF-IDF features.
+- [x] Train and compare Linear SVM and Multinomial Naive Bayes.
+  - WHEN a model is trained, THE SYSTEM SHALL persist it alongside its fitted
+    vectorizer for reuse at inference time.
+  - See `specs/050-baseline-model-training/spec.md`. Implemented in
+    `src/models/train.py`, verified by `tests/test_train.py`. Trained on
+    the full 151,848-row Spanish-augmented dataset (stratified 80/20
+    split, TF-IDF fit on the training split only to avoid leakage):
+    Logistic Regression won (79.14% accuracy, 0.7267 F1 on the hateful
+    class) over Linear SVM (78.35%, 0.7188) and Naive Bayes (78.06%,
+    0.6546), and was persisted to
+    `data/processed/baseline_model.joblib` with its matched vectorizer
+    at `data/processed/baseline_vectorizer.joblib`.
+
+## 5. Evaluation
+
+- [x] Compute accuracy, precision, recall, F1-score, and confusion matrix on a
+      held-out test set.
+- [x] Compare train vs. test metrics for overfitting.
+  - IF train/test metric gap exceeds 5 percentage points, THEN THE SYSTEM SHALL
+    flag the model as overfit in the evaluation report.
+  - See `specs/051-model-evaluation/spec.md`. Implemented in
+    `src/evaluation/evaluate.py`, verified by `tests/test_evaluate.py`.
+    Test-split results: 79.14% accuracy, 71.04% precision, 74.38% recall,
+    72.67% F1 (hateful class). All train/test gaps stay under the 5-point
+    threshold (largest: recall at 4.83 points) — **not overfit**.
+
+## 6. Hyperparameter tuning
+
+- [ ] Define the hyperparameter search space for the chosen model.
+- [ ] Run tuning (Optuna) and record the best parameters and resulting metrics.
+
+## 7. Serving
+
+- [x] Build a FastAPI endpoint that accepts raw text and returns a hate/not-hate
+      prediction.
+- [x] Build a Streamlit app that calls the prediction logic for manual testing.
+  - WHEN a user submits a comment through the app, THE SYSTEM SHALL display the
+    predicted label within the same session.
+  - See `specs/052-model-serving-api-ui/spec.md`. Implemented in
+    `src/models/predict.py` (shared logic), `src/api/main.py`
+    (`POST /predict`, `GET /health`), and `src/app/streamlit_app.py`,
+    verified by `tests/test_predict.py` and `tests/test_api.py`. Manual
+    testing caught and fixed a real bug: predictions must run the same
+    preprocessing pipeline as training (raw text fed straight to the
+    vectorizer gave near-random results) — both surfaces now take an
+    optional `language` (en/es) and preprocess before vectorizing.
+
+## 8. Documentation
+
+- [x] Document setup, usage, and evaluation results in the project README.
+  - See `specs/053-docs-and-docstrings/spec.md`. Every `src/` module and
+    public function now has a docstring (AST-audit verified). README's
+    "Project structure" section corrected to match the actual tree, and
+    a "Results at a glance" section added summarizing the final Nivel
+    Esencial numbers.
