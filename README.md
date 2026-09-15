@@ -220,6 +220,23 @@ This writes `data/processed/tfidf_vectorizer.joblib`. On the full 151,848
 row Spanish-augmented dataset both vectorizers share an 18,417-token
 vocabulary (`min_df=5`, 99.94% sparse).
 
+### Baseline model training
+
+Trains and compares Logistic Regression, Linear SVM, and Multinomial
+Naive Bayes on a stratified train/test split (TF-IDF fit on the training
+split only, to avoid leakage), and persists the best-performing model —
+see
+[`specs/050-baseline-model-training/spec.md`](specs/050-baseline-model-training/spec.md).
+
+```bash
+python scripts/train_baseline_model.py
+```
+
+This writes `data/processed/baseline_model.joblib` and
+`data/processed/baseline_vectorizer.joblib`. Logistic Regression won
+(79.14% accuracy, 0.7267 F1 on the hateful class) over Linear SVM and
+Naive Bayes.
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
