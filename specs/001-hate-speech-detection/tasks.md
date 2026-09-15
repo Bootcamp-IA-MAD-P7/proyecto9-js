@@ -70,11 +70,16 @@ Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria
 
 ## 5. Evaluation
 
-- [ ] Compute accuracy, precision, recall, F1-score, and confusion matrix on a
+- [x] Compute accuracy, precision, recall, F1-score, and confusion matrix on a
       held-out test set.
-- [ ] Compare train vs. test metrics for overfitting.
+- [x] Compare train vs. test metrics for overfitting.
   - IF train/test metric gap exceeds 5 percentage points, THEN THE SYSTEM SHALL
     flag the model as overfit in the evaluation report.
+  - See `specs/051-model-evaluation/spec.md`. Implemented in
+    `src/evaluation/evaluate.py`, verified by `tests/test_evaluate.py`.
+    Test-split results: 79.14% accuracy, 71.04% precision, 74.38% recall,
+    72.67% F1 (hateful class). All train/test gaps stay under the 5-point
+    threshold (largest: recall at 4.83 points) — **not overfit**.
 
 ## 6. Hyperparameter tuning
 

@@ -237,6 +237,21 @@ This writes `data/processed/baseline_model.joblib` and
 (79.14% accuracy, 0.7267 F1 on the hateful class) over Linear SVM and
 Naive Bayes.
 
+### Model evaluation
+
+Reports accuracy/precision/recall/F1/confusion matrix on both the
+training and held-out test splits for the persisted baseline model, and
+flags overfitting if any metric's train/test gap exceeds 5 percentage
+points — see
+[`specs/051-model-evaluation/spec.md`](specs/051-model-evaluation/spec.md).
+
+```bash
+python scripts/evaluate_model.py
+```
+
+Result: not overfit (largest train/test gap is recall at 4.83 points);
+test-split F1 of 72.67% on the hateful class.
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
