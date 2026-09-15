@@ -39,10 +39,18 @@ Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria
 
 ## 3. Feature extraction
 
-- [ ] Implement TF-IDF vectorization.
-- [ ] Implement Bag of Words vectorization for comparison.
+- [x] Implement TF-IDF vectorization.
+- [x] Implement Bag of Words vectorization for comparison.
   - WHEN a preprocessed corpus is vectorized, THE SYSTEM SHALL produce a fixed-size
     numeric feature matrix usable by scikit-learn estimators.
+  - See `specs/049-classic-text-vectorization/spec.md`. Implemented in
+    `src/features/vectorize.py`, verified by `tests/test_vectorize.py`.
+    Both vectorizers, run via `scripts/build_features.py` against the full
+    151,848-row Spanish-augmented dataset
+    (`enriched_comments_es_augmented_preprocessed.csv`), share an
+    18,417-token vocabulary (min_df=5, 99.94% sparse); TF-IDF was picked
+    as the baseline and persisted to
+    `data/processed/tfidf_vectorizer.joblib`.
 
 ## 4. Model training
 

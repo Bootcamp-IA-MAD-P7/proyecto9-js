@@ -205,6 +205,21 @@ re-runs the same analysis on the Spanish-augmented dataset, to see how much
 each finding shifts once the 7 orphan categories have Spanish coverage —
 same sections, same plot types, findings grounded in the new numbers.
 
+### Feature extraction (TF-IDF / Bag of Words)
+
+Vectorizes the `clean_comment` column with both TF-IDF and Bag of Words,
+compares their feature-space size, and persists the TF-IDF baseline for
+reuse at inference time — see
+[`specs/049-classic-text-vectorization/spec.md`](specs/049-classic-text-vectorization/spec.md).
+
+```bash
+python scripts/build_features.py
+```
+
+This writes `data/processed/tfidf_vectorizer.joblib`. On the full 151,848
+row Spanish-augmented dataset both vectorizers share an 18,417-token
+vocabulary (`min_df=5`, 99.94% sparse).
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
