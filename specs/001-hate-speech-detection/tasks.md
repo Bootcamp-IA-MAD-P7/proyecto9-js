@@ -23,13 +23,19 @@ Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria
 
 ## 2. Preprocessing
 
-- [ ] Implement text cleaning (lowercasing, URL/mention/emoji removal via regex).
+- [x] Implement text cleaning (lowercasing, URL/mention/emoji removal via regex).
   - WHEN raw comment text is passed in, THE SYSTEM SHALL return cleaned text with
     no URLs, HTML entities, or control characters.
-- [ ] Implement tokenization and stopword removal.
-- [ ] Implement stemming/lemmatization.
+- [x] Implement tokenization and stopword removal.
+- [x] Implement stemming/lemmatization.
   - WHEN cleaned text is tokenized, THE SYSTEM SHALL return a list of
     lemmatized/stemmed tokens excluding stopwords.
+  - See `specs/006-text-preprocessing/spec.md` for the full design.
+    Implemented in `src/preprocessing/{clean,tokenize,stem,pipeline}.py`,
+    language-aware (English/Spanish, matching the bilingual enriched
+    dataset), verified by `tests/test_preprocessing.py`. Applied to the
+    full 133,808-row enriched dataset in 46s via
+    `scripts/preprocess_enriched_dataset.py`.
 
 ## 3. Feature extraction
 
