@@ -27,7 +27,7 @@ def print_metrics(label: str, metrics: dict) -> None:
     print(f"\n{label}:")
     for name in ("accuracy", "precision", "recall", "f1"):
         print(f"  {name}: {metrics[name]:.4f}")
-    print(f"  confusion_matrix (rows=true, cols=pred, [[TN,FP],[FN,TP]]):")
+    print("  confusion_matrix (rows=true, cols=pred, [[TN,FP],[FN,TP]]):")
     print(f"  {metrics['confusion_matrix'].tolist()}")
 
 
