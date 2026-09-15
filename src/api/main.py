@@ -40,9 +40,12 @@ def get_predictor() -> Callable[[str, str], dict]:
 
 @app.get("/health")
 def health() -> dict:
+    """Liveness check — confirms the process is up and the model loaded."""
     return {"status": "ok"}
 
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest, predictor=Depends(get_predictor)) -> dict:
+    """Classify one comment as hate/not-hate. See contracts/predict.md
+    (specs/052-model-serving-api-ui/) for the request/response shape."""
     return predictor(request.text, request.language)

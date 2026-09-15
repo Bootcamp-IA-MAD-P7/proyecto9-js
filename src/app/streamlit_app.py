@@ -15,6 +15,8 @@ from src.models.predict import load_artifacts, predict_label  # noqa: E402
 
 @st.cache_resource
 def get_model_and_vectorizer():
+    """Load the persisted model/vectorizer once per Streamlit session
+    (cached), instead of re-reading the .joblib files on every rerun."""
     return load_artifacts()
 
 

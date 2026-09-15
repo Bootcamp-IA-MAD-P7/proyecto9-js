@@ -4,6 +4,25 @@ Automatic hate speech detection in YouTube comments, using classic NLP and
 machine learning. Built to help moderation teams flag hateful comments at
 scale instead of reviewing every comment manually.
 
+## Results at a glance
+
+Nivel Esencial (issues #4-#10) is complete. Final numbers, each detailed
+in its own README subsection and spec below:
+
+- **Dataset**: 151,848 bilingual (EN/ES) comments, 9 public sources plus
+  machine-translated Spanish augmentation for 7 previously zero-coverage
+  categories (homophobia, racism, violence, religion, disability,
+  transphobia, classism) — [`specs/048-spanish-category-augmentation/spec.md`](specs/048-spanish-category-augmentation/spec.md)
+- **Features**: TF-IDF, 18,417-token vocabulary — [`specs/049-classic-text-vectorization/spec.md`](specs/049-classic-text-vectorization/spec.md)
+- **Model**: Logistic Regression, chosen over Linear SVM and Multinomial
+  Naive Bayes — [`specs/050-baseline-model-training/spec.md`](specs/050-baseline-model-training/spec.md)
+- **Test-set metrics** (hateful class): 79.14% accuracy, 71.04%
+  precision, 74.38% recall, 72.67% F1 — **not overfit** (largest
+  train/test gap: 4.83 points, under the constitution's 5-point
+  threshold) — [`specs/051-model-evaluation/spec.md`](specs/051-model-evaluation/spec.md)
+- **Serving**: FastAPI (`POST /predict`) + Streamlit, both sharing one
+  prediction module — [`specs/052-model-serving-api-ui/spec.md`](specs/052-model-serving-api-ui/spec.md)
+
 ## Project structure
 
 ```
@@ -14,25 +33,35 @@ scale instead of reviewing every comment manually.
 └── scripts/bash/              # Spec Kit feature/plan/task automation scripts
 
 specs/
-├── 001-hate-speech-detection/  # Essential-level feature: spec, plan, tasks
-├── 002-develop-branch-workflow/ # Spec for the develop branch setup (retroactive)
-└── 003-project-structure-setup/ # Spec for this folder structure (retroactive)
+├── 001-hate-speech-detection/  # Master feature spec, plan, and the
+│                                 task list every other spec closes a
+│                                 section of (see "Spec-Driven Development"
+│                                 below)
+└── <NNN>-<slug>/                # One directory per task, each with its
+                                   own spec.md (and plan/research/tasks
+                                   for non-trivial ones) — run `ls specs/`
+                                   for the current, always-up-to-date list
 
 src/                            # Source code implementing the specs
-├── data/                        # Dataset loading (loader.py implemented)
-├── preprocessing/                # Text cleaning, tokenization, stopwords, stemming/lemmatization
+├── data/                        # Dataset loading, harmonization, and the
+│                                  Spanish/sarcasm augmentation pipelines
+├── preprocessing/                # Text cleaning, tokenization, stopwords, stemming
 ├── features/                      # Vectorization (TF-IDF, Bag of Words)
-├── models/                         # Training and hyperparameter tuning
+├── models/                         # Training (train.py) and inference (predict.py)
 ├── evaluation/                      # Metrics and overfitting checks
 ├── api/                              # Prediction service (FastAPI)
 └── app/                                # User-facing interface (Streamlit)
+
+scripts/                         # One entry point per pipeline step
+                                    (build_*, preprocess_*, train_*,
+                                    evaluate_*) — see the walkthrough below
 
 data/
 ├── raw/                          # Original, unmodified dataset (gitignored)
 └── processed/                     # Cleaned/preprocessed dataset (gitignored)
 
-tests/                            # Unit tests (pytest)
-notebooks/                        # Exploratory analysis notebooks
+tests/                            # Unit tests (pytest), one file per src/ module
+notebooks/                        # Exploratory analysis notebooks (committed pre-executed)
 docker/                           # Container setup
 .github/workflows/ci.yml          # CI: runs the test suite on every push/PR
 ```
