@@ -127,6 +127,20 @@ Spanish half is machine-translated (local model, no rate limits), not
 native Spanish sarcasm — translation takes ~80-90 minutes on CPU for the
 full corpus.
 
+### Text preprocessing
+
+Language-aware cleaning, tokenization, stopword removal, and stemming
+(English + Spanish) — see
+[`specs/006-text-preprocessing/spec.md`](specs/006-text-preprocessing/spec.md).
+To apply it to the enriched dataset:
+
+```bash
+python scripts/preprocess_enriched_dataset.py
+```
+
+This writes `data/processed/enriched_comments_preprocessed.csv` (adds a
+`clean_comment` column), taking ~45 seconds for the full 133,808 rows.
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
