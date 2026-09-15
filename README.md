@@ -97,6 +97,34 @@ hate, ~59,100 Spanish rows — near-parity with English). See
 [`specs/004-dataset-enrichment/spec.md`](specs/004-dataset-enrichment/spec.md)
 for the category-mapping decisions.
 
+### Spanish augmentation for zero-coverage categories (optional)
+
+Seven categories (homophobia, racism, violence, religion, disability,
+transphobia, classism) have zero or near-zero native Spanish rows in the
+enriched dataset. This machine-translates the existing English hateful
+comments in those categories into Spanish (local model, no rate limits),
+tagging translated rows with a `_es_mt` source suffix so they stay
+distinguishable from native Spanish data. See
+[`specs/048-spanish-category-augmentation/spec.md`](specs/048-spanish-category-augmentation/spec.md)
+for the rationale and the public-dataset alternatives considered.
+
+1. Install the heavy NLP dependencies (only needed for translation), if not
+   already installed for the sarcasm dataset above:
+
+   ```bash
+   pip install -r requirements-nlp.txt
+   ```
+
+2. Build the augmented dataset:
+
+   ```bash
+   python scripts/build_spanish_augmentation.py
+   ```
+
+This writes `data/processed/enriched_comments_es_augmented.csv` (the
+enriched dataset plus ~27,000 translated Spanish rows), taking roughly the
+same order of magnitude as the sarcasm dataset run (~80-90 minutes on CPU).
+
 ### Auxiliary sarcasm dataset (optional, English + machine-translated Spanish)
 
 Kept separate from the hate-speech dataset above (different corpus, different
@@ -176,7 +204,7 @@ via GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 ## Project management
 
 Progress is tracked on a Kanban board (GitHub Projects):
-[NLP Hate Speech Detection - Project](https://github.com/orgs/Bootcamp-IA-MAD-P7/projects/49),
+[proyecto9-js - NLP Hate Speech Detection](https://github.com/orgs/Bootcamp-IA-MAD-P7/projects/50),
 with columns Backlog / Todo / In Progress / Done, mirroring the delivery
 levels from the briefing (Esencial, Medio, Avanzado, Experto).
 
