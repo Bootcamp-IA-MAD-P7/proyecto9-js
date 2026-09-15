@@ -252,6 +252,30 @@ python scripts/evaluate_model.py
 Result: not overfit (largest train/test gap is recall at 4.83 points);
 test-split F1 of 72.67% on the hateful class.
 
+### Serving (API + UI)
+
+Exposes the persisted baseline model through a FastAPI endpoint and a
+Streamlit app for manual testing, sharing one prediction module — see
+[`specs/052-model-serving-api-ui/spec.md`](specs/052-model-serving-api-ui/spec.md).
+
+```bash
+uvicorn src.api.main:app --reload
+```
+
+```bash
+curl -X POST http://127.0.0.1:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"text": "you are all disgusting", "language": "en"}'
+```
+
+```bash
+streamlit run src/app/streamlit_app.py
+```
+
+`language` is `"en"` or `"es"` (defaults to `"en"`) — required so the
+input gets the same cleaning/stemming the model was trained on before
+being vectorized.
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.

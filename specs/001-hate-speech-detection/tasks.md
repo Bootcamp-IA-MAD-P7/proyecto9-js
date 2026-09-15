@@ -88,11 +88,19 @@ Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria
 
 ## 7. Serving
 
-- [ ] Build a FastAPI endpoint that accepts raw text and returns a hate/not-hate
+- [x] Build a FastAPI endpoint that accepts raw text and returns a hate/not-hate
       prediction.
-- [ ] Build a Streamlit app that calls the prediction logic for manual testing.
+- [x] Build a Streamlit app that calls the prediction logic for manual testing.
   - WHEN a user submits a comment through the app, THE SYSTEM SHALL display the
     predicted label within the same session.
+  - See `specs/052-model-serving-api-ui/spec.md`. Implemented in
+    `src/models/predict.py` (shared logic), `src/api/main.py`
+    (`POST /predict`, `GET /health`), and `src/app/streamlit_app.py`,
+    verified by `tests/test_predict.py` and `tests/test_api.py`. Manual
+    testing caught and fixed a real bug: predictions must run the same
+    preprocessing pipeline as training (raw text fed straight to the
+    vectorizer gave near-random results) — both surfaces now take an
+    optional `language` (en/es) and preprocess before vectorizing.
 
 ## 8. Documentation
 
