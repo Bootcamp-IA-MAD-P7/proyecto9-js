@@ -298,6 +298,22 @@ two metrics where the baseline passed clean. The Logistic Regression
 baseline remains the served model; the ensemble is persisted separately
 (`data/processed/ensemble_model.joblib`) for reference only.
 
+### Hyperparameter tuning (Nivel Medio)
+
+Optuna search over `C`/`penalty`/`class_weight` for the served Logistic
+Regression baseline — cross-validated on the training split only, final
+model evaluated once on the untouched test split — see
+[`specs/055-optuna-hyperparameter-tuning/spec.md`](specs/055-optuna-hyperparameter-tuning/spec.md).
+
+```bash
+python scripts/tune_hyperparameters.py
+```
+
+Result: modest but real improvement (F1 +0.17pp, accuracy +0.07pp,
+recall +0.43pp; precision -0.06pp) over the baseline. Persisted
+separately (`data/processed/tuned_model.joblib`) for review; the served
+baseline is unchanged.
+
 ### Serving (API + UI)
 
 Exposes the persisted baseline model through a FastAPI endpoint and a
