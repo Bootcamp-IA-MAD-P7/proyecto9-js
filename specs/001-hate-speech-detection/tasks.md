@@ -104,4 +104,9 @@ Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria
 
 ## 8. Documentation
 
-- [ ] Document setup, usage, and evaluation results in the project README.
+- [x] Document setup, usage, and evaluation results in the project README.
+  - See `specs/053-docs-and-docstrings/spec.md`. Every `src/` module and
+    public function now has a docstring (AST-audit verified). README's
+    "Project structure" section corrected to match the actual tree, and
+    a "Results at a glance" section added summarizing the final Nivel
+    Esencial numbers.
