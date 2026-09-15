@@ -122,8 +122,12 @@ for the rationale and the public-dataset alternatives considered.
    ```
 
 This writes `data/processed/enriched_comments_es_augmented.csv` (the
-enriched dataset plus ~27,000 translated Spanish rows), taking roughly the
-same order of magnitude as the sarcasm dataset run (~80-90 minutes on CPU).
+enriched dataset plus translated Spanish rows), taking roughly the same
+order of magnitude as the sarcasm dataset run (~80-90 minutes on CPU). The
+full run translated 18,040 rows, growing the dataset from 133,808 to
+151,848 rows (77,166 Spanish / 74,682 English) — see
+[`specs/048-spanish-category-augmentation/spec.md`](specs/048-spanish-category-augmentation/spec.md#result)
+for the full before/after comparison.
 
 ### Auxiliary sarcasm dataset (optional, English + machine-translated Spanish)
 
@@ -167,7 +171,15 @@ python scripts/preprocess_enriched_dataset.py
 ```
 
 This writes `data/processed/enriched_comments_preprocessed.csv` (adds a
-`clean_comment` column), taking ~45 seconds for the full 133,808 rows.
+`clean_comment` column), taking ~45 seconds for the full 133,808 rows. Pass
+`--input`/`--output` to run it against another harmonized CSV, e.g. the
+Spanish-augmented dataset:
+
+```bash
+python scripts/preprocess_enriched_dataset.py \
+  --input data/processed/enriched_comments_es_augmented.csv \
+  --output data/processed/enriched_comments_es_augmented_preprocessed.csv
+```
 
 ### Exploratory Data Analysis (EDA)
 
@@ -187,6 +199,11 @@ NotebookClient(nb, timeout=600, resources={'metadata': {'path': 'notebooks'}}).e
 nbformat.write(nb, 'notebooks/eda_enriched_dataset.ipynb')
 "
 ```
+
+[`notebooks/eda_enriched_dataset_es_augmented.ipynb`](notebooks/eda_enriched_dataset_es_augmented.ipynb)
+re-runs the same analysis on the Spanish-augmented dataset, to see how much
+each finding shifts once the 7 orphan categories have Spanish coverage —
+same sections, same plot types, findings grounded in the new numbers.
 
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
