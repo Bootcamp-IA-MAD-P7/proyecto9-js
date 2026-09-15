@@ -281,6 +281,23 @@ python scripts/evaluate_model.py
 Result: not overfit (largest train/test gap is recall at 4.83 points);
 test-split F1 of 72.67% on the hateful class.
 
+### Ensemble model (Nivel Medio)
+
+Trains a hard-voting ensemble over the same three baseline algorithms
+and compares it against the persisted baseline on the identical test
+split — see
+[`specs/054-ensemble-model/spec.md`](specs/054-ensemble-model/spec.md).
+
+```bash
+python scripts/train_ensemble_model.py
+```
+
+Result: the ensemble does **not** beat the baseline — it trades a small
+accuracy/precision gain for worse recall/F1, and shows overfitting on
+two metrics where the baseline passed clean. The Logistic Regression
+baseline remains the served model; the ensemble is persisted separately
+(`data/processed/ensemble_model.joblib`) for reference only.
+
 ### Serving (API + UI)
 
 Exposes the persisted baseline model through a FastAPI endpoint and a
