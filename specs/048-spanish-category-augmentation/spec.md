@@ -73,14 +73,54 @@ modeling split.
 
 ## Result
 
-<!-- Filled in after the full translation run. -->
+Ran `scripts/build_spanish_augmentation.py` against the full enriched
+dataset (133,808 rows), translating with `num_beams=1` greedy decoding
+(see `src/data/translate.py`): completed in ~91 minutes on CPU, translating
+**18,040 rows** and writing `data/processed/enriched_comments_es_augmented.csv`
+(151,848 rows: 77,166 Spanish / 74,682 English).
+
+The 7 orphan categories all moved from 0% to an exact 50/50 EN/ES split
+(each English hateful row produced exactly one Spanish translation):
+`violence` 10,160 → 20,320, `racism` 8,183 → 16,366, `religion` 4,290 →
+8,580, `homophobia` 3,315 → 6,630, `disability` 681 → 1,362, `transphobia`
+432 → 864, `classism` 1 → 2. Overall class balance shifted from 28.8% to
+37.3% hateful (augmentation only adds `label == 1` rows), and language
+balance flipped from 55.8% EN / 44.2% ES to 49.2% EN / 50.8% ES.
+
+One data-quality artifact surfaced during the follow-up EDA: a handful of
+structurally-odd source rows (long runs of hashtag/symbol characters) all
+translate to the same degenerate Spanish output under greedy decoding,
+nudging exact duplicates from 0.28% to 0.31% of rows — small enough not to
+block use, but worth filtering out of the source rows before a future
+translation run.
+
+Full before/after analysis, including the pipeline follow-up below, is in
+[`notebooks/eda_enriched_dataset_es_augmented.ipynb`](../../notebooks/eda_enriched_dataset_es_augmented.ipynb).
+
+## Follow-up: wired into the pipeline
+
+The augmented file is now wired into the rest of the pipeline (was listed
+as out of scope below, done in a follow-up task):
+
+- `scripts/preprocess_enriched_dataset.py` takes `--input`/`--output`, so
+  it can run against `enriched_comments_es_augmented.csv` instead of only
+  the default `enriched_comments.csv`. Produced
+  `data/processed/enriched_comments_es_augmented_preprocessed.csv` (34.4s
+  for 151,848 rows).
+- `notebooks/eda_enriched_dataset_es_augmented.ipynb` mirrors
+  `notebooks/eda_enriched_dataset.ipynb` section-for-section (same plots,
+  same structure) but computed on the augmented + preprocessed data, with
+  every finding re-grounded in the new numbers per
+  `specs/007-eda-enriched-dataset/spec.md`'s own success criteria.
 
 ## Out of scope
 
 - Pursuing HOMO-MEX registration (recommended to the user as a parallel,
-  native-data track, not blocking this synthetic-augmentation work).
+  native-data track, not blocking this synthetic-augmentation work) — in
+  progress; blocked as of this writing on an ODESIA portal server error
+  (Drupal database lock timeout) during password setup, not on anything
+  in this repo.
 - Building a custom scraped dataset (a heavier, separate initiative).
-- Wiring the augmented file into the preprocessing pipeline / EDA notebook
-  automatically — those were built against `enriched_comments.csv` and can
-  be re-pointed at `enriched_comments_es_augmented.csv` in a follow-up task
-  once the augmented data is reviewed.
+- Replacing `enriched_comments.csv` / `enriched_comments_preprocessed.csv`
+  in place — both the pre- and post-augmentation datasets are kept side by
+  side so the EDA comparison stays reproducible.
