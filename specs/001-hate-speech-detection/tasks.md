@@ -54,10 +54,19 @@ Atomic tasks derived from `plan.md`, written with EARS-style acceptance criteria
 
 ## 4. Model training
 
-- [ ] Train baseline Logistic Regression on TF-IDF features.
-- [ ] Train and compare Linear SVM and Multinomial Naive Bayes.
+- [x] Train baseline Logistic Regression on TF-IDF features.
+- [x] Train and compare Linear SVM and Multinomial Naive Bayes.
   - WHEN a model is trained, THE SYSTEM SHALL persist it alongside its fitted
     vectorizer for reuse at inference time.
+  - See `specs/050-baseline-model-training/spec.md`. Implemented in
+    `src/models/train.py`, verified by `tests/test_train.py`. Trained on
+    the full 151,848-row Spanish-augmented dataset (stratified 80/20
+    split, TF-IDF fit on the training split only to avoid leakage):
+    Logistic Regression won (79.14% accuracy, 0.7267 F1 on the hateful
+    class) over Linear SVM (78.35%, 0.7188) and Naive Bayes (78.06%,
+    0.6546), and was persisted to
+    `data/processed/baseline_model.joblib` with its matched vectorizer
+    at `data/processed/baseline_vectorizer.joblib`.
 
 ## 5. Evaluation
 
