@@ -141,6 +141,25 @@ python scripts/preprocess_enriched_dataset.py
 This writes `data/processed/enriched_comments_preprocessed.csv` (adds a
 `clean_comment` column), taking ~45 seconds for the full 133,808 rows.
 
+### Exploratory Data Analysis (EDA)
+
+[`notebooks/eda_enriched_dataset.ipynb`](notebooks/eda_enriched_dataset.ipynb)
+is committed **already executed** — open it on GitHub to see every plot
+and finding without running anything. See
+[`specs/007-eda-enriched-dataset/spec.md`](specs/007-eda-enriched-dataset/spec.md)
+for the full write-up. To regenerate it after changing the data or the
+pipeline:
+
+```bash
+python -c "
+import nbformat
+from nbclient import NotebookClient
+nb = nbformat.read('notebooks/eda_enriched_dataset.ipynb', as_version=4)
+NotebookClient(nb, timeout=600, resources={'metadata': {'path': 'notebooks'}}).execute()
+nbformat.write(nb, 'notebooks/eda_enriched_dataset.ipynb')
+"
+```
+
 See [`specs/001-hate-speech-detection/spec.md`](specs/001-hate-speech-detection/spec.md)
 for the current feature scope and [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 for the project's guiding principles.
